@@ -18,7 +18,7 @@ namespace apc {
             namespace artnet {
                 static const int port = 6454;
                 static const int net = 0;
-                static const int subNet = 0;
+                static const int subnet = 0;
                 static const int universe = 0;
             }
             namespace osc {
@@ -39,6 +39,7 @@ namespace apc {
         static const uint8_t ledPinList[8] = {35, 29, 24, 20, 17, 14, 8, 1};
         static const uint8_t dipPinList[8] = {33, 34, 41, 36, 37, 38, 39, 40};
         static const int maxPixels = 680;
+        static const IPAddress broadcastIP(255, 255, 255, 255);
     }
 } // namespace apc
 

@@ -18,12 +18,14 @@ class Artnet {
    public:
     Artnet(){};
     ~Artnet(){};
-    void init(int port, uint16_t net=0, uint8_t subnet=0, uint8_t uni=0) {
+    void init(int port, IPAddress ip, IPAddress sub, uint16_t net=0, uint8_t subnet=0, uint8_t uni=0) {
         this->net = net;
         this->subnet = subnet;
         this->universe = universe;
         this->startUniverse = universe + 16 * subnet + 256 * net;
         artnet.setSocketSize(1024 * 16);
+        // artnet.setBroadcast(variables::broadcastIP);
+        artnet.setBroadcastAuto(ip, sub);
         artnet.begin(port);
         // artnet.setArtDmxCallback(&Artnet::onDmxFrameListener);
         // artnet.setArtSyncCallback(&Artnet::onSyncListener);

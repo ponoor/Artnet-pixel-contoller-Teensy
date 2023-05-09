@@ -25,10 +25,10 @@ class Config {
         DeserializationError error = deserializeJson(json, eepromStream);
         // TODO: 書き込み後の初回起動にeepromを無視してデフォルトにできる機能
         if (error) {
-            Serial.print(F("deserializeJson() failed !!!: "));
+            Serial.print(F("read config failed !!!: "));
             Serial.println(error.f_str());
         } else {
-            Serial.println(F("deserializeJson() success !!!"));
+            Serial.println(F("read config success !!!"));
         }
         using namespace variables::defaultSettings;
         
@@ -45,7 +45,7 @@ class Config {
         initCategory("artnet", artnetObj);
         initValue(artnetObj, "port", artnet::port);
         initValue(artnetObj, "net", artnet::net);
-        initValue(artnetObj, "subNet", artnet::subNet);
+        initValue(artnetObj, "subnet", artnet::subnet);
         initValue(artnetObj, "universe", artnet::universe);
 
         JsonObject oscObj;
@@ -63,9 +63,6 @@ class Config {
         initValue(ledObj, "initTest", led::initTest);
 
         serializeJson(json, eepromStream);
-
-        serializeJsonPretty(json, Serial);
-        Serial.println();
     }
     void write(int address = 0) {
         EepromStream eepromStream(address, size);
@@ -111,9 +108,9 @@ class Config {
         bool result = false;
         if(json.containsKey(category)) {
             JsonObject obj = json[category].as<JsonObject>();
-            Serial.printf("json contains key: %s\n", category);
+            // Serial.printf("json contains key: %s\n", category);
             if (obj.containsKey(name)) {
-                Serial.printf("obj contains key: %s\n", name);
+                // Serial.printf("obj contains key: %s\n", name);
                 if (obj[name].is<int>()) {
                     obj[name] = value;
                     result = true;
@@ -128,12 +125,12 @@ class Config {
         bool result = false;
         if(json.containsKey(category)) {
             JsonObject obj = json[category].as<JsonObject>();
-            Serial.printf("json contains key: %s\n", category);
+            // Serial.printf("json contains key: %s\n", category);
             if (obj.containsKey(name)) {
                 JsonArray arr = obj[name].as<JsonArray>();
                 if (arr.size() == size) {
                     for (uint8_t i = 0; i < size; i ++) {
-                        Serial.printf("obj contains key: %s[%d]=%d\n", name, i, value[i]);
+                        // Serial.printf("obj contains key: %s[%d]=%d\n", name, i, value[i]);
                         arr[i] = value[i];
                     }
                     result = true;
@@ -148,9 +145,9 @@ class Config {
         bool result = false;
         if(json.containsKey(category)) {
             JsonObject obj = json[category].as<JsonObject>();
-            Serial.printf("json contains key: %s\n", category);
+            // Serial.printf("json contains key: %s\n", category);
             if (obj.containsKey(name)) {
-                Serial.printf("obj contains key: %s\n", name);
+                // Serial.printf("obj contains key: %s\n", name);
                 if (obj[name].is<IPAddress>()) {
                     obj[name] = value;
                     result = true;

@@ -45,17 +45,42 @@ class Osc {
             if (osc.parse(oscBuffer, size)) {
                 uint8_t argCount = osc.getArgCount();
                 // Serial.println("Good message: This should print.");
-                // Serial.printf("  Address: %s\n", osc.getAddress());
+                Serial.printf("OSC: address: %s\n", osc.getAddress());
                 // Serial.printf("  Arg count: %d\n", argCount);
-                // for (uint8_t i = 0; i < argCount; i++) {
-                //     Serial.printf("  Param(%d): '%c'\n", i, osc.getTag(i));
-                // }
+                for (uint8_t i = 0; i < argCount; i++) {
+                    Serial.printf("param(%d): '%c'\n", i, osc.getTag(i));
+                }
                 if (osc.match(0, "/rst")) {
                     if (rstCallback) {
                         (*rstCallback)();
                     }
+                } else if (osc.match(0, "/ping")) {
+                    bool bMatch = true;
+                    for (uint8_t i = 0; i < 4; i ++) {
+                        if (dstIp[i] != Udp.remoteIP()[i]) {
+                            bMatch = false;
+                        }
+                    }
+                    osc.init("/pong");
+                    osc.addInt(bMatch);
+                    size_t size = osc.getMessageSize();
+                    Udp.beginPacket(Udp.remoteIP(), dstPort);
+                    Udp.write(osc.getMessageBuf(), size);
+                    Udp.endPacket();
                 } else if (osc.match(0, "/setDstIp")) {
+                    bool bMatch = true;
+                    for (uint8_t i = 0; i < 4; i ++) {
+                        if (dstIp[i] != Udp.remoteIP()[i]) {
+                            bMatch = false;
+                        }
+                    }
                     this->dstIp = Udp.remoteIP();
+                    osc.init("/replyDstIp");
+                    osc.addInt(bMatch);
+                    size_t size = osc.getMessageSize();
+                    Udp.beginPacket(dstIp, dstPort);
+                    Udp.write(osc.getMessageBuf(), size);
+                    Udp.endPacket();
                 } else if (osc.match(0, "/ledTest")) {
                     if (ledTestCallback) {
                         ledTestCallback();
@@ -69,17 +94,16 @@ class Osc {
                     char* result[8];
 
                     strcpy(source, osc.getAddress());
-                    size_t resultSize;
+                    size_t resultSize = split(source, "/", result, 8);
 
-                    Serial.printf("src: %s\n", source);
-                    resultSize = split(source, "/", result, 8);
-                    Serial.printf("size: %d\n", resultSize);
-                    for (size_t i = 0; i < resultSize; ++i) {
-                        Serial.printf("%d: %s\n", i, result[i]);
-                    }
+                    // Serial.printf("src: %s\n", source);
+                    // Serial.printf("size: %d\n", resultSize);
+                    // for (size_t i = 0; i < resultSize; ++i) {
+                    //     Serial.printf("%d: %s\n", i, result[i]);
+                    // }
 
                     if (osc.match(0, "/config")) {
-                        Serial.println("match /config");
+                        // Serial.println("match /config");
                         if (3 <= resultSize) {
                             if (argCount == 1) {
                                 if (osc.isInt(0)) {
@@ -145,16 +169,14 @@ class Osc {
     void sendConfigReply(const char* category, const char* name, bool result) {
         char buf[64];
         const char* separator = "/";
-        strcpy(buf, separator);
+        strcpy(buf, "/config/");
         strcat(buf, category);
         strcat(buf, separator);
         strcat(buf, name);
         
-        Serial.print(buf);
-
         osc.init(buf);
         osc.addInt((int)result);
-        static size_t size = osc.getMessageSize();
+        size_t size = osc.getMessageSize();
 
         Udp.beginPacket(dstIp, dstPort);
         Udp.write(osc.getMessageBuf(), size);

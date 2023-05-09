@@ -44,7 +44,7 @@ uint16_t numPixels;
 bool bSerialOpen = false;
 void setup() {
     Serial.begin(115200);
-    // while (! Serial); 
+    while (! Serial); 
     delay(1000);
     Serial.println("program start");
 
@@ -71,36 +71,14 @@ void setup() {
         config.json["network"]["gateway"], 
         config.json["network"]["gateway"], 
         config.json["network"]["subnet"]);
-    
-    Serial.print("mac: ");
-    for (auto i = 0; i < 6; i ++) {
-        Serial.print(mac[i]);
-        if (i < 5) {
-            Serial.print(":");
-        } else {
-            Serial.println();
-        }
-    }
-    Serial.print("ip: ");
-    for (auto i = 0; i < 4; i ++) {
-        Serial.print(ip[i]);
-        if (i < 3) {
-            Serial.print(".");
-        } else {
-            Serial.println();
-        }
-    }
-    // Ethernet.begin(
-    //     config.json["network"]["mac"],
-    //     ip, gateway, gateway, subnet
-    // );
-    // Ethernet.begin(mac, ip, gateway, gateway, subnet);
-    // Ethernet.begin(mac, ip);
+
     universePerStrip = config.json["led"]["numPixels"].as<uint16_t>() / 170.0f;
     
     artnet.init(config.json["artnet"]["port"], 
+        ip,
+        config.json["network"]["subnet"],
         config.json["artnet"]["net"], 
-        config.json["artnet"]["subNet"], 
+        config.json["artnet"]["subnet"], 
         config.json["artnet"]["universe"]);
     
     artnet.setArtDmxCallback(onDmxFrame);
@@ -222,7 +200,7 @@ void printDeviceSetting() {
     Ethernet.MACAddress(mac);
     Serial.printf("mac: %d:%d:%d:%d:%d:%d\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     Serial.print("============================\n");
-    config.print();
+    config.print(true);
 }
 
 void printIp(const char* name, IPAddress ip) {
