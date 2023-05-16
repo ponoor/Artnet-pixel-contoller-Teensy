@@ -40,17 +40,18 @@ void printDeviceSetting();
 void printIp(const char* name, IPAddress ip);
 
 uint8_t universePerStrip;
-uint16_t numPixels;
 bool bSerialOpen = false;
+bool bLink = false;
 void setup() {
     Serial.begin(115200);
     // while (! Serial); 
     delay(1000);
     Serial.println("program start");
+    pinMode(apc::variables::linkPin, OUTPUT);
 
     config.init(0, 1024);
-
     id.init();
+    
     uint8_t deviceId = id.getId();
 
     uint8_t mac[6];
@@ -112,6 +113,19 @@ void setup() {
 void loop() {
     artnet.update();
     osc.update();
+
+    if(Ethernet.linkStatus() == LinkON) {
+        if (!bLink) {
+            bLink = true;
+            digitalWrite(apc::variables::linkPin, HIGH);
+        }
+    } else {
+        if (bLink) {
+            bLink = false;
+            digitalWrite(apc::variables::linkPin, LOW);
+        }
+    }
+
     if (Serial) {
         if (!bSerialOpen) {
             bSerialOpen = true;

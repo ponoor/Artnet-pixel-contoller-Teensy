@@ -40,6 +40,7 @@ namespace apc {
         static const uint8_t ledPinList[8] = {35, 29, 24, 20, 17, 14, 8, 1};
         static const uint8_t dipPinList[8] = {33, 34, 41, 36, 37, 38, 39, 40};
         static const int maxPixels = 680;
+        static const int linkPin = 19;
     }
 } // namespace apc
 
