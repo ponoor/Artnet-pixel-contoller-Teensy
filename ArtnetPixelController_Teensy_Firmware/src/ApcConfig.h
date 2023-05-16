@@ -47,6 +47,8 @@ class Config {
         initValue(artnetObj, "net", artnet::net);
         initValue(artnetObj, "subnet", artnet::subnet);
         initValue(artnetObj, "universe", artnet::universe);
+        initValue(artnetObj, "fps", artnet::fps);
+        initValue(artnetObj, "forceSync", artnet::forceSync);
 
         JsonObject oscObj;
         initCategory("osc", oscObj);
@@ -82,6 +84,11 @@ class Config {
         }
     }
     void initValue(JsonObject& obj, const char* name, int value) {
+        if (!obj.containsKey(name)) {
+            obj[name] = value;
+        }
+    }
+    void initValue(JsonObject& obj, const char* name, float value) {
         if (!obj.containsKey(name)) {
             obj[name] = value;
         }
@@ -149,6 +156,23 @@ class Config {
             if (obj.containsKey(name)) {
                 // Serial.printf("obj contains key: %s\n", name);
                 if (obj[name].is<IPAddress>()) {
+                    obj[name] = value;
+                    result = true;
+                    serializeJsonPretty(json, Serial);
+                    Serial.println();
+                }
+            }
+        }
+        return result;
+    }
+    bool setValue(const char* category, const char* name, float value) {
+        bool result = false;
+        if(json.containsKey(category)) {
+            JsonObject obj = json[category].as<JsonObject>();
+            // Serial.printf("json contains key: %s\n", category);
+            if (obj.containsKey(name)) {
+                // Serial.printf("obj contains key: %s\n", name);
+                if (obj[name].is<float>()) {
                     obj[name] = value;
                     result = true;
                     serializeJsonPretty(json, Serial);

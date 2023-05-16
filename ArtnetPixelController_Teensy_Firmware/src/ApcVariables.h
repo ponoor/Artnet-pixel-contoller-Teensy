@@ -20,6 +20,8 @@ namespace apc {
                 static const int net = 0;
                 static const int subnet = 0;
                 static const int universe = 0;
+                static const float fps = 44.0f;
+                static const uint8_t forceSync = 0;
             }
             namespace osc {
                 static const int dstPort = 50000;
@@ -32,14 +34,12 @@ namespace apc {
                 static const uint8_t protocol = WS2811_800kHz;
                 static const uint8_t colorOrder = WS2811_GRB;
                 static const uint8_t initTest = 1;
-                // static int ws2811_800kHz
             }
         }
         static const int numStrips = 8;
         static const uint8_t ledPinList[8] = {35, 29, 24, 20, 17, 14, 8, 1};
         static const uint8_t dipPinList[8] = {33, 34, 41, 36, 37, 38, 39, 40};
         static const int maxPixels = 680;
-        static const IPAddress broadcastIP(255, 255, 255, 255);
     }
 } // namespace apc
 

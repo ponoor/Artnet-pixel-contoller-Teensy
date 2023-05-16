@@ -28,7 +28,7 @@ apc::Led led;
 void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence,
                 uint8_t* data, IPAddress remoteIP);
 void onSync(IPAddress remoteIP);
-
+void onNonSync();
 void onReceiveRst();
 void onReceiveLedTest();
 void onReceivePrint();
@@ -44,7 +44,7 @@ uint16_t numPixels;
 bool bSerialOpen = false;
 void setup() {
     Serial.begin(115200);
-    while (! Serial); 
+    // while (! Serial); 
     delay(1000);
     Serial.println("program start");
 
@@ -79,10 +79,14 @@ void setup() {
         config.json["network"]["subnet"],
         config.json["artnet"]["net"], 
         config.json["artnet"]["subnet"], 
-        config.json["artnet"]["universe"]);
+        config.json["artnet"]["universe"],
+        config.json["artnet"]["fps"],
+        (bool)config.json["artnet"]["foceSync"]);
     
     artnet.setArtDmxCallback(onDmxFrame);
     artnet.setArtSyncCallback(onSync);
+    artnet.setNonSyncCallback(onNonSync);
+
     int dstPort = config.json["osc"]["dstPort"];
     if (config.json["osc"]["dstPortAddId"]) {
         dstPort += deviceId;
@@ -120,6 +124,10 @@ void loop() {
     }
     // put your main code here, to run repeatedly:
 }
+
+// uint32_t dmxTimestamp = 0;
+// uint32_t syncTimestamp = 0;
+
 void onDmxFrame(
     uint16_t universe, 
     uint16_t length, 
@@ -138,10 +146,21 @@ void onDmxFrame(
     // Serial.println("}");
     
     led.setPixels(stripIndex, universeIndex * 170, data, length);
+    // if (universe == 0) {
+    //     uint32_t now = millis();
+    //     Serial.printf("dmx time: %d, delta: %d\t", now, now - dmxTimestamp);
+    //     dmxTimestamp = now;
+    // }
 }
 //on dmx frame: { uni: 31, len: 512, strip index: 7, univIndex: 3}
 void onSync(IPAddress remoteIP) { 
     // Serial.println("on sync: ");
+    led.show();
+    // uint32_t now = millis();
+    // Serial.printf("sync time: %d, delta: %d\n", now, now - syncTimestamp);
+    // syncTimestamp = now;
+}
+void onNonSync() {
     led.show();
 }
 
@@ -189,7 +208,15 @@ void onReceiveConfigIpaddress(const char* category, const char* name, IPAddress 
     }
     osc.sendConfigReply(category, name, result);
 }
-
+void onReceiveConfigFloat(const char* category, const char* name, float value) {
+    bool result = false;
+    if (config.setValue(category, name, value)) {
+        config.write();
+        result = true;
+    }
+    Serial.printf("cat: %s, name: %s, value: %f, result: %d\n", category, name, value, result);
+    osc.sendConfigReply(category, name, result);
+}
 void printDeviceSetting() {
     Serial.print("============================\n");
     Serial.printf("device id: %d\n", id.getId());

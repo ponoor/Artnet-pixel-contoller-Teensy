@@ -110,7 +110,11 @@ class Osc {
                                     if (configCallbackInt) {
                                         configCallbackInt(result[1], result[2], osc.getInt(0));
                                     }
-                                }
+                                } else if (osc.isFloat(0)) {
+                                    if (configCallbackFloat) {
+                                        configCallbackFloat(result[1], result[2], osc.getFloat(0));
+                                    }
+                                } 
                             } else if (argCount == 4) {
                                 if (osc.isInt(0) && osc.isInt(1) && osc.isInt(2) && osc.isInt(3)) {
                                     if (configCallbackIpaddress) {
@@ -165,6 +169,9 @@ class Osc {
     }
     void setConfigCallbackIpaddress(void (*fptr)(const char* category, const char* name, IPAddress value)) {
         configCallbackIpaddress = fptr;
+    }
+    void setConfigCallbackFloat(void (*fptr)(const char* category, const char* name, float value)) {
+        configCallbackFloat = fptr;
     }
     void sendConfigReply(const char* category, const char* name, bool result) {
         char buf[64];
