@@ -19,6 +19,13 @@ class Config {
         this->address = address;
         this->size = size;
         read(address, size); 
+        initJson();
+        write(address);
+    }
+    void clear() {
+        json.clear();
+        initJson();
+        write(address);
     }
     void read(int address, size_t size) {
         EepromStream eepromStream(address, size);
@@ -30,6 +37,13 @@ class Config {
         } else {
             Serial.println(F("read config success !!!"));
         }
+        // serializeJson(json, eepromStream);
+    }
+    void write(int address = 0) {
+        EepromStream eepromStream(address, size);
+        serializeJson(json, eepromStream);
+    }
+    void initJson() {
         using namespace variables::defaultSettings;
         
         JsonObject networkObj;
@@ -63,14 +77,7 @@ class Config {
         initValue(ledObj, "protocol", led::protocol);
         initValue(ledObj, "colorOrder", led::colorOrder);
         initValue(ledObj, "initTest", led::initTest);
-
-        serializeJson(json, eepromStream);
     }
-    void write(int address = 0) {
-        EepromStream eepromStream(address, size);
-        serializeJson(json, eepromStream);
-    }
-
     void initCategory(const char* name, JsonObject& obj) {
         if (json.containsKey(name)) {
             obj = json[name].as<JsonObject>();

@@ -10,7 +10,7 @@ namespace apc {
                 static const IPAddress ip(10, 0, 1, 0);
                 static const IPAddress gateway(10, 0, 0, 1);
                 static const IPAddress subnet(255, 255, 0, 0);
-                static const uint8_t mac[6] = {0x04, 0xE4, 0xE6, 0x04, 0x68, 0x00};
+                static const uint8_t mac[6] = {0x60, 0x95, 0xCE, 0x10, 0x07, 0x00};//60:95:CE:10:07:xx 
                 static const uint8_t ipAddId = 1;
                 static const uint8_t macAddId = 1;
                 

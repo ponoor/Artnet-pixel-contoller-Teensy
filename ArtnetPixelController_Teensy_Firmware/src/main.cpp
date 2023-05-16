@@ -29,9 +29,11 @@ void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence,
                 uint8_t* data, IPAddress remoteIP);
 void onSync(IPAddress remoteIP);
 void onNonSync();
+
 void onReceiveRst();
 void onReceiveLedTest();
 void onReceivePrint();
+void onReceiveClearConfig();
 void onReceiveConfigInt(const char* category, const char* name, int value);
 void onReceiveConfigIntArray(const char* category, const char* name, int* value, size_t size);
 void onReceiveConfigIpaddress(const char* category, const char* name, IPAddress value);
@@ -51,7 +53,7 @@ void setup() {
 
     config.init(0, 1024);
     id.init();
-    
+
     uint8_t deviceId = id.getId();
 
     uint8_t mac[6];
@@ -95,6 +97,7 @@ void setup() {
     osc.init(config.json["osc"]["srcPort"], config.json["osc"]["dstIp"], dstPort);
     osc.setRstCallback(onReceiveRst);
     osc.setPrintCallback(onReceivePrint);
+    osc.setClearConfigCallback(onReceiveClearConfig);
     osc.setLedTestCallback(onReceiveLedTest);
     osc.setConfigCallbackInt(onReceiveConfigInt);
     osc.setConfigCallbackIntArray(onReceiveConfigIntArray);
@@ -191,6 +194,9 @@ void onReceiveLedTest() {
 }
 void onReceivePrint() {
     printDeviceSetting();
+}
+void onReceiveClearConfig() {
+    config.clear();
 }
 void onReceiveConfigInt(const char* category, const char* name, int value) {
     bool result = false;

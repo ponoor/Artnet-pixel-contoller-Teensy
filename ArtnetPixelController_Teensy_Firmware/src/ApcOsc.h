@@ -10,13 +10,14 @@ class Osc {
     EthernetUDP Udp;
     qindesign::osc::LiteOSCParser osc;
     uint8_t oscBuffer[1024];
-    
+
     IPAddress dstIp;
     int dstPort;
 
     void (*rstCallback)();
     void (*ledTestCallback)();
     void (*printCallback)();
+    void (*clearConfigCallback)();
     void (*configCallbackInt)(const char*, const char*, int);
     void (*configCallbackIntArray)(const char*, const char*, int*, size_t);
     void (*configCallbackIpaddress)(const char*, const char*, IPAddress);
@@ -33,9 +34,7 @@ class Osc {
         this->dstPort = dstPort;
     }
 
-    void update() { 
-        parseOsc();
-    }
+    void update() { parseOsc(); }
 
     void parseOsc() {
         size_t size;
@@ -56,7 +55,7 @@ class Osc {
                     }
                 } else if (osc.match(0, "/ping")) {
                     bool bMatch = true;
-                    for (uint8_t i = 0; i < 4; i ++) {
+                    for (uint8_t i = 0; i < 4; i++) {
                         if (dstIp[i] != Udp.remoteIP()[i]) {
                             bMatch = false;
                         }
@@ -69,7 +68,7 @@ class Osc {
                     Udp.endPacket();
                 } else if (osc.match(0, "/setDstIp")) {
                     bool bMatch = true;
-                    for (uint8_t i = 0; i < 4; i ++) {
+                    for (uint8_t i = 0; i < 4; i++) {
                         if (dstIp[i] != Udp.remoteIP()[i]) {
                             bMatch = false;
                         }
@@ -88,6 +87,10 @@ class Osc {
                 } else if (osc.match(0, "/print")) {
                     if (printCallback) {
                         printCallback();
+                    }
+                } else if (osc.match(0, "/clearConfig")) {
+                    if (clearConfigCallback) {
+                        clearConfigCallback();
                     }
                 } else {
                     char source[64];
@@ -108,46 +111,38 @@ class Osc {
                             if (argCount == 1) {
                                 if (osc.isInt(0)) {
                                     if (configCallbackInt) {
-                                        configCallbackInt(result[1], result[2], osc.getInt(0));
+                                        configCallbackInt(result[1], result[2],
+                                                          osc.getInt(0));
                                     }
                                 } else if (osc.isFloat(0)) {
                                     if (configCallbackFloat) {
-                                        configCallbackFloat(result[1], result[2], osc.getFloat(0));
+                                        configCallbackFloat(result[1],
+                                                            result[2],
+                                                            osc.getFloat(0));
                                     }
-                                } 
+                                }
                             } else if (argCount == 4) {
-                                if (osc.isInt(0) && osc.isInt(1) && osc.isInt(2) && osc.isInt(3)) {
+                                if (osc.isInt(0) && osc.isInt(1) &&
+                                    osc.isInt(2) && osc.isInt(3)) {
                                     if (configCallbackIpaddress) {
                                         configCallbackIpaddress(
-                                            result[1], 
-                                            result[2], 
+                                            result[1], result[2],
                                             IPAddress(
-                                                osc.getInt(0), 
-                                                osc.getInt(1), 
-                                                osc.getInt(2), 
-                                                osc.getInt(3)));
+                                                osc.getInt(0), osc.getInt(1),
+                                                osc.getInt(2), osc.getInt(3)));
                                     }
                                 }
                             } else if (argCount == 6) {
-                                if (osc.isInt(0) && 
-                                    osc.isInt(1) && 
-                                    osc.isInt(2) && 
-                                    osc.isInt(3) && 
-                                    osc.isInt(4) && 
-                                    osc.isInt(5)) {
+                                if (osc.isInt(0) && osc.isInt(1) &&
+                                    osc.isInt(2) && osc.isInt(3) &&
+                                    osc.isInt(4) && osc.isInt(5)) {
                                     if (configCallbackIntArray) {
                                         int arr[] = {
-                                            osc.getInt(0), 
-                                            osc.getInt(1),
-                                            osc.getInt(2),
-                                            osc.getInt(3),
-                                            osc.getInt(4),
-                                            osc.getInt(5)};
+                                            osc.getInt(0), osc.getInt(1),
+                                            osc.getInt(2), osc.getInt(3),
+                                            osc.getInt(4), osc.getInt(5)};
                                         configCallbackIntArray(
-                                            result[1], 
-                                            result[2], 
-                                            arr,
-                                            6);
+                                            result[1], result[2], arr, 6);
                                     }
                                 }
                             }
@@ -160,17 +155,24 @@ class Osc {
     void setRstCallback(void (*fptr)()) { rstCallback = fptr; }
     void setLedTestCallback(void (*fptr)()) { ledTestCallback = fptr; }
     void setPrintCallback(void (*fptr)()) { printCallback = fptr; }
+    void setClearConfigCallback(void (*fptr)()) { clearConfigCallback = fptr; }
 
-    void setConfigCallbackInt(void (*fptr)(const char* category, const char* name, int value)) {
+    void setConfigCallbackInt(void (*fptr)(const char* category,
+                                           const char* name, int value)) {
         configCallbackInt = fptr;
     }
-    void setConfigCallbackIntArray(void (*fptr)(const char* category, const char* name, int* value, size_t size)) {
+    void setConfigCallbackIntArray(void (*fptr)(const char* category,
+                                                const char* name, int* value,
+                                                size_t size)) {
         configCallbackIntArray = fptr;
     }
-    void setConfigCallbackIpaddress(void (*fptr)(const char* category, const char* name, IPAddress value)) {
+    void setConfigCallbackIpaddress(void (*fptr)(const char* category,
+                                                 const char* name,
+                                                 IPAddress value)) {
         configCallbackIpaddress = fptr;
     }
-    void setConfigCallbackFloat(void (*fptr)(const char* category, const char* name, float value)) {
+    void setConfigCallbackFloat(void (*fptr)(const char* category,
+                                             const char* name, float value)) {
         configCallbackFloat = fptr;
     }
     void sendConfigReply(const char* category, const char* name, bool result) {
@@ -180,18 +182,20 @@ class Osc {
         strcat(buf, category);
         strcat(buf, separator);
         strcat(buf, name);
-        
+
         osc.init(buf);
         osc.addInt((int)result);
         size_t size = osc.getMessageSize();
 
         Udp.beginPacket(dstIp, dstPort);
         Udp.write(osc.getMessageBuf(), size);
-        Udp.endPacket(); // mark the end of the OSC Packet
+        Udp.endPacket();  // mark the end of the OSC Packet
     }
 
-    size_t split(char* source, const char* separator, char** result, size_t resultSize) {
-        if ((source == NULL) || (separator == NULL) || (result == NULL) || (resultSize <= 0)) {
+    size_t split(char* source, const char* separator, char** result,
+                 size_t resultSize) {
+        if ((source == NULL) || (separator == NULL) || (result == NULL) ||
+            (resultSize <= 0)) {
             return 0;
         };
         size_t i = 0;
