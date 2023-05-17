@@ -7,7 +7,8 @@
 #include "ApcId.h"
 #include "ApcArtnet.h"
 #include "ApcOsc.h"
-#include "ApcLed.h"
+// #include "ApcLed.h"
+#include "ApcSerialLed.h"
 
 // #define RESTART_ADDR       0xE000ED0C
 // #define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
@@ -23,7 +24,7 @@ apc::Config config;
 apc::Id id;
 apc::Artnet artnet;
 apc::Osc osc;
-apc::Led led;
+apc::SerialLed led;
 
 void onDmxFrame(uint16_t universe, uint16_t length, uint8_t sequence,
                 uint8_t* data, IPAddress remoteIP);
