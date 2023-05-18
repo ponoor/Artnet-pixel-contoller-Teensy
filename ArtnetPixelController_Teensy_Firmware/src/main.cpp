@@ -76,7 +76,7 @@ void setup() {
         config.json["network"]["gateway"], 
         config.json["network"]["subnet"]);
 
-    universePerStrip = config.json["led"]["numPixels"].as<uint16_t>() / 170.0f;
+    universePerStrip = ceil(config.json["led"]["numPixels"].as<uint16_t>() / 170.0f);
     
     artnet.init(config.json["artnet"]["port"], 
         ip,
