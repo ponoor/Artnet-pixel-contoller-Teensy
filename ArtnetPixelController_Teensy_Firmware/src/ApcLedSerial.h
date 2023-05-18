@@ -1,5 +1,5 @@
-#ifndef APC_SERIAL_LED_H
-#define APC_SERIAL_LED_H
+#ifndef APC_LED_SERIAL_H
+#define APC_LED_SERIAL_H
 #include <Arduino.h>
 #include <WS2812Serial.h>
 
@@ -16,7 +16,7 @@ int drawingMemory[variables::numStrips][variables::maxPixels * 12];
 //             WS2811_GRB | WS2811_800kHz, 
 //             variables::numStrips, 
 //             pinList);
-class SerialLed {
+class LedSerial {
    private:
     WS2812Serial* leds[variables::numStrips];
     
@@ -27,8 +27,8 @@ class SerialLed {
     int numLeds;
     int numLedsPerStrip;
    public:
-    SerialLed(){};
-    ~SerialLed(){
+    LedSerial(){};
+    ~LedSerial(){
         // delete[] displayMemory;
         // delete[] drawingMemory;
         // delete leds;
@@ -95,7 +95,11 @@ class SerialLed {
     }
     void show() {
         for (int i = 0; i < variables::numStrips; i++) {
-            leds[i]->show(); 
+            if (leds[i]->busy()) {
+                // Serial.printf("led[%d] busy !!!\n", i);
+            } else {
+                leds[i]->show();
+            }
         }
     }
 };
