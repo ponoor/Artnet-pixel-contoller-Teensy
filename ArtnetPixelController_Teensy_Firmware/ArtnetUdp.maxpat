@@ -40,6 +40,52 @@
 		"assistshowspatchername" : 0,
 		"boxes" : [ 			{
 				"box" : 				{
+					"id" : "obj-15",
+					"maxclass" : "message",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 720.0, 840.0, 41.0, 23.0 ],
+					"text" : "/ping"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-8",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 840.0, 885.0, 140.0, 23.0 ],
+					"text" : "print oscRx @popup 1"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-3",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 840.0, 840.0, 114.0, 23.0 ],
+					"text" : "udpreceive 50000"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"id" : "obj-2",
+					"maxclass" : "newobj",
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 615.0, 885.0, 154.0, 23.0 ],
+					"text" : "udpsend 10.0.1.1 50000"
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-165",
 					"maxclass" : "comment",
 					"numinlets" : 1,
@@ -889,7 +935,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "int" ],
-					"patching_rect" : [ 15.0, 855.0, 200.0, 23.0 ],
+					"patching_rect" : [ 15.0, 885.0, 200.0, 23.0 ],
 					"text" : "sadam.udpSender 10.0.1.1 6454"
 				}
 
@@ -1483,7 +1529,23 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-2", 0 ],
+					"source" : [ "obj-15", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-2", 0 ],
+					"order" : 0,
+					"source" : [ "obj-151", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-80", 0 ],
+					"order" : 1,
 					"source" : [ "obj-151", 0 ]
 				}
 
@@ -1639,6 +1701,13 @@
 				"patchline" : 				{
 					"destination" : [ "obj-32", 0 ],
 					"source" : [ "obj-29", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-8", 0 ],
+					"source" : [ "obj-3", 0 ]
 				}
 
 			}
